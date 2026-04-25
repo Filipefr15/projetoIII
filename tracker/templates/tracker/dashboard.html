@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brand Tracker - Enterprise Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a; /* neutral-950 equivalent */
+            color: #e5e5e5; /* neutral-200 */
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        .bento-card {
+            background-color: #171717; /* neutral-900 */
+            border: 1px solid #262626; /* neutral-800 */
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .input-field {
+            background-color: #0a0a0a;
+            border: 1px solid #262626;
+            color: #e5e5e5;
+            transition: all 0.2s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6; /* blue-500 */
+            box-shadow: 0 0 0 1px #3b82f6;
+        }
+
+        .btn-primary {
+            background-color: #2563eb; /* blue-600 */
+            color: white;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8; /* blue-700 */
+        }
+        
+        /* Shimmer effect for skeleton loader */
+        @keyframes shimmer {
+            100% { transform: translateX(100%); }
+        }
+        .skeleton-box {
+            position: relative;
+            overflow: hidden;
+            background-color: #262626;
+            border-radius: 4px;
+        }
+        .skeleton-box::after {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            transform: translateX(-100%);
+            background-image: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0,
+                rgba(255, 255, 255, 0.02) 20%,
+                rgba(255, 255, 255, 0.05) 60%,
+                rgba(255, 255, 255, 0)
+            );
+            animation: shimmer 2s infinite;
+            content: '';
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <nav class="border-b border-neutral-800 bg-neutral-900 px-6 py-4 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <!-- Brand -->
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center font-bold text-white">BT</div>
+                <span class="text-xl font-semibold tracking-tight text-white">BrandTracker</span>
+            </div>
+
+            <!-- Global Search -->
+            <form id="searchForm" method="GET" action="/" class="w-full md:w-1/2 flex gap-2">
+                <input type="text" name="q" value="{{ query }}" placeholder="Pesquisar marca, concorrente ou ticker..." required
+                       class="input-field w-full px-4 py-2 rounded-md text-sm">
+                <button type="submit" class="btn-primary px-6 py-2 rounded-md text-sm font-medium">
+                    Buscar
+                </button>
+            </form>
+
+            <!-- User Area -->
+            <div class="hidden md:flex items-center gap-4">
+                <div class="flex items-center gap-3 pr-4 border-r border-neutral-800">
+                    <div class="text-right">
+                        <p class="text-xs font-medium text-white">{{ request.user.username }}</p>
+                        <p class="text-[10px] text-neutral-500">Enterprise User</p>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-xs font-bold text-blue-400">
+                        {{ request.user.username|slice:":1"|upper }}
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    {% if request.user.is_staff %}
+                        <a href="/admin/" class="text-neutral-500 hover:text-white transition-colors" title="Painel Admin">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'logout' %}" class="text-neutral-500 hover:text-rose-400 transition-colors" title="Sair">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-4 md:p-8 max-w-7xl mx-auto w-full">
+        
+        {% if query %}
+            <div class="mb-6 flex justify-between items-end">
+                <div>
+                    <h1 class="text-2xl font-semibold text-white">Resultados para: <span class="text-blue-400">"{{ query }}"</span></h1>
+                    <p class="text-sm text-neutral-500 mt-1">Análise em tempo real baseada em {{ noticias|length }} publicações recentes.</p>
+                </div>
+            </div>
+
+            <!-- Bento Grid Layout -->
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                
+                <!-- AI Summary (Spans 3 columns) -->
+                <div class="bento-card p-6 md:col-span-2 lg:col-span-3 flex flex-col">
+                    <div class="flex items-center gap-2 mb-4">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <h2 class="text-sm font-semibold text-neutral-300 uppercase tracking-wider">Resumo Executivo da IA</h2>
+                    </div>
+                    
+                    <div id="aiSummaryContent" class="text-neutral-300 text-sm leading-relaxed flex-grow">
+                        {% if resumo_ia %}
+                            {{ resumo_ia|linebreaks }}
+                        {% else %}
+                            <!-- Skeleton Loader for AI -->
+                            <div class="space-y-3 py-2">
+                                <div class="skeleton-box h-4 w-full"></div>
+                                <div class="skeleton-box h-4 w-5/6"></div>
+                                <div class="skeleton-box h-4 w-full"></div>
+                                <div class="skeleton-box h-4 w-4/5"></div>
+                            </div>
+                            <p class="text-xs text-neutral-500 mt-4 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                                Sintetizando contexto global via Gemini AI...
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Sentiment Overview (Spans 1 column) -->
+                <div class="bento-card p-6 flex flex-col items-center justify-center">
+                    <h2 class="text-sm font-semibold text-neutral-300 uppercase tracking-wider w-full mb-4 text-left">Sentimento</h2>
+                    <div class="relative h-40 w-full flex justify-center">
+                        <canvas id="sentimentChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Trend Chart (Spans 2 columns) -->
+                <div class="bento-card p-6 md:col-span-2 lg:col-span-2">
+                    <h2 class="text-sm font-semibold text-neutral-300 uppercase tracking-wider mb-4">Volume Histórico</h2>
+                    <div class="relative h-64 w-full">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- News Feed (Spans 2 columns) -->
+                <div class="bento-card p-0 md:col-span-1 lg:col-span-2 flex flex-col h-full">
+                    <div class="p-6 border-b border-neutral-800">
+                        <h2 class="text-sm font-semibold text-neutral-300 uppercase tracking-wider">Últimas Publicações</h2>
+                    </div>
+                    <div class="overflow-y-auto h-64 p-2">
+                        {% for noticia in noticias %}
+                            <div class="p-4 hover:bg-neutral-800/50 transition-colors border-b border-neutral-800/50 last:border-0 rounded-md">
+                                <div class="flex items-start justify-between gap-4 mb-2">
+                                    <a href="{{ noticia.url }}" target="_blank" class="text-sm font-medium text-blue-400 hover:underline line-clamp-2 leading-tight">
+                                        {{ noticia.titulo }}
+                                    </a>
+                                    {% if noticia.analise.classificacao == 'POSITIVO' %}
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap">POS</span>
+                                    {% elif noticia.analise.classificacao == 'NEGATIVO' %}
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20 whitespace-nowrap">NEG</span>
+                                    {% else %}
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-500/10 text-neutral-400 border border-neutral-500/20 whitespace-nowrap">NEU</span>
+                                    {% endif %}
+                                </div>
+                                <div class="flex items-center gap-3 text-xs text-neutral-500">
+                                    <span>{{ noticia.data_publicacao|date:"d M Y, H:i" }}</span>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="p-6 text-center text-neutral-500 text-sm">Nenhum dado recente encontrado.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+            
+            <script>
+                // Modern Colors for Charts
+                const colorPos = '#10b981'; // emerald-500
+                const colorNeu = '#525252'; // neutral-500
+                const colorNeg = '#f43f5e'; // rose-500
+                const gridColor = '#262626'; // neutral-800
+                const textColor = '#a3a3a3'; // neutral-400
+
+                // Sentiment Doughnut Chart
+                const ctxSentiment = document.getElementById('sentimentChart').getContext('2d');
+                new Chart(ctxSentiment, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Positivo', 'Neutro', 'Negativo'],
+                        datasets: [{
+                            data: [{{ sentimento_stats.POSITIVO }}, {{ sentimento_stats.NEUTRO }}, {{ sentimento_stats.NEGATIVO }}],
+                            backgroundColor: [colorPos, colorNeu, colorNeg],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false // Hidden to keep it minimalist
+                            },
+                            tooltip: {
+                                backgroundColor: '#171717',
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                borderColor: '#262626',
+                                borderWidth: 1
+                            }
+                        },
+                        cutout: '75%'
+                    }
+                });
+
+                // Trend Line Chart
+                const ctxTrend = document.getElementById('trendChart').getContext('2d');
+                const trendLabels = {{ chart_data.labels|safe }};
+                const trendData = {{ chart_data.data|safe }};
+                
+                new Chart(ctxTrend, {
+                    type: 'line',
+                    data: {
+                        labels: trendLabels,
+                        datasets: [{
+                            label: 'Menções',
+                            data: trendData,
+                            borderColor: '#3b82f6', // blue-500
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#0a0a0a',
+                            pointBorderColor: '#3b82f6',
+                            pointHoverRadius: 5,
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { intersect: false, mode: 'index' },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#171717',
+                                borderColor: '#262626',
+                                borderWidth: 1,
+                                padding: 10
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: gridColor, drawBorder: false },
+                                ticks: { color: textColor, font: { family: 'Inter', size: 11 }, precision: 0 }
+                            },
+                            x: {
+                                grid: { display: false, drawBorder: false },
+                                ticks: { color: textColor, font: { family: 'Inter', size: 11 }, maxTicksLimit: 5 }
+                            }
+                        }
+                    }
+                });
+            </script>
+        {% else %}
+            <!-- Blank State for Enterprise Dashboard -->
+            <div class="flex flex-col items-center justify-center h-full min-h-[60vh] text-center">
+                <div class="w-16 h-16 bg-neutral-900 border border-neutral-800 rounded-xl flex items-center justify-center mb-6 shadow-sm">
+                    <svg class="w-8 h-8 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <h2 class="text-2xl font-semibold text-white mb-2">Plataforma de Inteligência</h2>
+                <p class="text-neutral-500 max-w-md text-sm">
+                    Insira uma marca ou termo no topo para iniciar a varredura global. 
+                    Nossa IA compilará as métricas de reputação e sentimento em tempo real.
+                </p>
+            </div>
+        {% endif %}
+        
+    </main>
+
+    <script>
+        // AJAX logic for AI Summary loading
+        {% if query and not resumo_ia %}
+        document.addEventListener('DOMContentLoaded', function() {
+            const query = "{{ query|escapejs }}";
+            const summaryContainer = document.getElementById('aiSummaryContent');
+            
+            fetch(`/api/summary/?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if(data.summary) {
+                        summaryContainer.innerHTML = `<div class="animate-fade-in">${data.summary.replace(/\n/g, '<br>')}</div>`;
+                    } else if (data.error) {
+                        summaryContainer.innerHTML = `<p class="text-rose-400">Error: ${data.error}</p>`;
+                    }
+                })
+                .catch(error => {
+                    summaryContainer.innerHTML = `<p class="text-rose-400">Erro de conexão com o módulo de IA.</p>`;
+                });
+        });
+        {% endif %}
+    </script>
+</body>
+</html>

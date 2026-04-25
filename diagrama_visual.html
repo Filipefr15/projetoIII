@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama da Arquitetura</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+        .legenda {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #34495e;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Diagrama de Arquitetura: Django + IA</h1>
+    <p class="subtitle">Visão geral simplificada do sistema com Dashboard Interativo e Agente de IA</p>
+    
+    <div class="mermaid">
+        flowchart TB
+            classDef frontend fill:#E3F2FD,stroke:#1565C0,stroke-width:2px,color:#000;
+            classDef backend fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px,color:#000;
+            classDef service fill:#FFF3E0,stroke:#E65100,stroke-width:2px,color:#000;
+            classDef storage fill:#F3E5F5,stroke:#6A1B9A,stroke-width:2px,color:#000;
+            classDef external fill:#ECEFF1,stroke:#455A64,stroke-width:2px,stroke-dasharray: 5 5,color:#000;
+
+            subgraph Frontend_Layer ["🖥️ Frontend (Interface do Usuário)"]
+                UI["Dashboard & Chat<br>(React/Next.js ou HTMX/Tailwind)"]:::frontend
+            end
+
+            subgraph Backend_Layer ["⚙️ Backend (Django)"]
+                API["Django REST API<br>(HTTP/REST)"]:::backend
+                WS["Django Channels<br>(WebSockets)"]:::backend
+                Apps["Módulos Internos<br>(Users, Dashboard, AI_Agent)"]:::backend
+            end
+
+            subgraph Async_Layer ["⚡ Processamento Assíncrono e IA"]
+                Celery["Celery Workers<br>(Background Jobs)"]:::service
+                AI["Serviço de IA<br>(LangChain/LlamaIndex)"]:::service
+            end
+
+            subgraph Data_Layer ["💾 Armazenamento e Fila"]
+                Redis[("Redis<br>(Fila do Celery)")]:::storage
+                DB[("PostgreSQL<br>(Dados Relacionais)")]:::storage
+            end
+
+            LLM(("🤖 API do LLM<br>(OpenAI, Anthropic, etc.)")):::external
+
+            %% Connections
+            UI <-->|"HTTP (JSON)"| API
+            UI <-->|"WebSockets (Streaming)"| WS
+            
+            API <--> Apps
+            WS <--> Apps
+            
+            Apps <-->|"Leitura/Escrita"| DB
+            Apps -.->|"Envia Tarefas"| Redis
+            
+            Redis -.->|"Consome Tarefas"| Celery
+            Celery --> AI
+            
+            AI <-->|"Busca de Dados"| DB
+            AI <-->|"Geração de Texto"| LLM
+    </div>
+
+    <div class="legenda">
+        <h3>Como entender o diagrama atualizado:</h3>
+        <ul>
+            <li><strong>Frontend:</strong> O usuário acessa o painel (Dashboard) e o Chat. Requisições normais vão para a API REST, e o chat usa WebSockets para comunicação em tempo real.</li>
+            <li><strong>Backend (Django):</strong> O Django é o cérebro que recebe tudo. O <em>Django Channels</em> mantém a conexão aberta para o chat enviar respostas de forma dinâmica.</li>
+            <li><strong>Assíncrono (Celery/Redis):</strong> Como a IA demora a responder, o Django manda o trabalho pesado para os "Workers" do Celery usando o Redis exclusivamente como fila de tarefas (Broker).</li>
+            <li><strong>Armazenamento:</strong> Todos os dados do sistema e contextos ficam concentrados no PostgreSQL.</li>
+            <li><strong>Serviço de IA:</strong> O LangChain organiza a lógica, consulta o banco de dados (PostgreSQL) para dar contexto e pede à API do LLM para gerar a resposta final.</li>
+        </ul>
+    </div>
+</div>
+
+<script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+</script>
+
+</body>
+</html>

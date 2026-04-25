@@ -1,0 +1,301 @@
+/* ==========================================================
+   Brand Tracker — Admin CSS
+   Paleta idêntica ao dashboard principal: #0a0a0a + azul
+   SEM neon, SEM glow, SEM cyber. Só limpo e profissional.
+   ========================================================== */
+
+:root {
+    --bg:      #0a0a0a;
+    --surface: #111114;
+    --card:    #171717;
+    --raised:  #1e1e22;
+    --border:  #262629;
+    --blue:    #3b82f6;
+    --blue-h:  #2563eb;
+    --green:   #10b981;
+    --red:     #f43f5e;
+    --yellow:  #f59e0b;
+    --text:    #e8ecf4;
+    --sub:     #a1a1aa;
+    --muted:   #52525b;
+    --r:       8px;
+}
+
+/* ── Global ──────────────────────────────────────────────── */
+html, body, .wrapper, .content-wrapper,
+section.content, .content, #content,
+#content-main, .container-fluid, .row,
+[class*="col-"], .app-index, .admin-index,
+.dashboard, #dashboard, .change-list, .results {
+    background-color: var(--bg) !important;
+    color: var(--text) !important;
+    font-family: 'Inter', -apple-system, sans-serif !important;
+}
+
+a { color: var(--blue) !important; text-decoration: none !important; }
+a:hover { color: #93c5fd !important; }
+h1,h2,h3,h4,h5,h6 { color: var(--text) !important; }
+
+/* ── Topbar ──────────────────────────────────────────────── */
+.main-header.navbar {
+    background-color: var(--surface) !important;
+    border-bottom: 1px solid var(--border) !important;
+    box-shadow: none !important;
+}
+.brand-text { color: var(--text) !important; font-weight: 600 !important; }
+.main-header .nav-link { color: var(--sub) !important; }
+.main-header .nav-link:hover { color: var(--text) !important; }
+.main-header .form-control {
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text) !important;
+    border-radius: var(--r) !important;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.main-sidebar, .sidebar {
+    background-color: var(--surface) !important;
+    border-right: 1px solid var(--border) !important;
+    box-shadow: none !important;
+}
+.brand-link {
+    background-color: var(--surface) !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+.sidebar .nav-sidebar > .nav-item > .nav-link {
+    color: var(--sub) !important;
+    border-radius: var(--r) !important;
+    margin: 2px 8px !important;
+    font-size: 13px !important;
+    transition: background .15s, color .15s !important;
+}
+.sidebar .nav-sidebar > .nav-item > .nav-link:hover {
+    background-color: var(--raised) !important;
+    color: var(--text) !important;
+}
+.sidebar .nav-sidebar > .nav-item > .nav-link.active {
+    background-color: var(--blue) !important;
+    color: #fff !important;
+}
+.sidebar .nav-sidebar > .nav-item > .nav-link.active .nav-icon { color: #fff !important; }
+.nav-icon { color: var(--muted) !important; }
+.nav-header { color: var(--muted) !important; font-size: 10px !important; letter-spacing: 1px !important; text-transform: uppercase !important; }
+.sidebar .nav-treeview .nav-link { color: var(--muted) !important; font-size: 12px !important; padding-left: 32px !important; }
+.sidebar .nav-treeview .nav-link:hover { color: var(--text) !important; }
+
+/* ── Breadcrumb & header ─────────────────────────────────── */
+.content-header { background: transparent !important; border-bottom: 1px solid var(--border) !important; }
+.breadcrumb { background: transparent !important; padding: 0 !important; margin: 0 !important; }
+.breadcrumb-item, .breadcrumb-item a { color: var(--muted) !important; font-size: 12px !important; }
+.breadcrumb-item a:hover { color: var(--sub) !important; }
+.breadcrumb-item.active { color: var(--sub) !important; }
+
+/* ── Cards ───────────────────────────────────────────────── */
+.card {
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+}
+.card-header {
+    background: var(--raised) !important;
+    border-bottom: 1px solid var(--border) !important;
+    color: var(--sub) !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .5px !important;
+}
+.card-body { padding: 16px !important; }
+
+/* ── Tables ──────────────────────────────────────────────── */
+table, tr, td, th { background-color: transparent !important; }
+.table, #result_list { color: var(--text) !important; }
+.table thead th, #result_list thead th, #result_list thead th a {
+    background: var(--raised) !important;
+    color: var(--sub) !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .4px !important;
+    border-bottom: 1px solid var(--border) !important;
+    border-top: none !important;
+    padding: 10px 14px !important;
+}
+#result_list thead th a { color: var(--sub) !important; }
+#result_list thead th a:hover { color: var(--text) !important; }
+.table td, #result_list td {
+    background-color: var(--card) !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+    padding: 10px 14px !important;
+    vertical-align: middle !important;
+}
+#result_list tbody tr:hover td { background-color: var(--raised) !important; }
+
+/* ── Modules (index app cards) ───────────────────────────── */
+.module, fieldset.module {
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    margin-bottom: 16px !important;
+}
+.module > caption, .module h2, .module > h2, .fieldset-title {
+    background: var(--raised) !important;
+    color: var(--sub) !important;
+    border-bottom: 1px solid var(--border) !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .5px !important;
+    padding: 10px 16px !important;
+    border-radius: 10px 10px 0 0 !important;
+    margin: 0 !important;
+}
+.module table td, .module table th { border-color: var(--border) !important; color: var(--text) !important; }
+#content-related { background: var(--card) !important; border-left: 1px solid var(--border) !important; }
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn, button, input[type="submit"], input[type="button"],
+a.addlink, a.changelink, .object-tools a {
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    border-radius: var(--r) !important;
+    transition: all .15s !important;
+}
+/* Primary */
+.btn-primary, .submit-row input[type="submit"],
+input[type="submit"].default, .object-tools a, a.addlink {
+    background-color: var(--blue) !important;
+    border-color: var(--blue) !important;
+    color: #fff !important;
+    padding: 6px 14px !important;
+}
+.btn-primary:hover, .object-tools a:hover, a.addlink:hover {
+    background-color: var(--blue-h) !important;
+    border-color: var(--blue-h) !important;
+    color: #fff !important;
+}
+/* Secondary */
+.btn-secondary, .btn-default, a.changelink {
+    background-color: var(--raised) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--sub) !important;
+    padding: 6px 14px !important;
+}
+.btn-secondary:hover, a.changelink:hover {
+    background-color: #2a2a2e !important;
+    color: var(--text) !important;
+}
+/* Danger */
+.btn-danger, a.deletelink, .submit-row a.deletelink {
+    background-color: transparent !important;
+    border: 1px solid var(--red) !important;
+    color: var(--red) !important;
+    padding: 6px 14px !important;
+}
+.btn-danger:hover, a.deletelink:hover {
+    background-color: var(--red) !important;
+    color: #fff !important;
+}
+/* Success */
+.btn-success {
+    background-color: var(--green) !important;
+    border-color: var(--green) !important;
+    color: #fff !important;
+}
+/* Submit row */
+.submit-row {
+    background: var(--raised) !important;
+    border-top: 1px solid var(--border) !important;
+    border-radius: 0 0 10px 10px !important;
+    padding: 12px 16px !important;
+    gap: 8px !important;
+}
+
+/* ── Forms ───────────────────────────────────────────────── */
+.form-control, select, textarea,
+input[type="text"], input[type="password"],
+input[type="email"], input[type="number"], input[type="url"],
+.vTextField, .vURLField, .vEmailField {
+    background: var(--raised) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text) !important;
+    border-radius: var(--r) !important;
+    font-size: 13px !important;
+    padding: 7px 12px !important;
+}
+.form-control:focus, select:focus, textarea:focus, input:focus {
+    border-color: var(--blue) !important;
+    box-shadow: 0 0 0 2px rgba(59,130,246,.2) !important;
+    outline: none !important;
+    background: var(--raised) !important;
+}
+label { color: var(--sub) !important; font-size: 13px !important; }
+.help-block, p.help { color: var(--muted) !important; font-size: 11px !important; }
+.form-row, .fieldBox { border-bottom: 1px solid var(--border) !important; padding: 12px 16px !important; }
+.form-row:last-child, .fieldBox:last-child { border-bottom: none !important; }
+.errorlist li { color: var(--red) !important; font-size: 12px !important; }
+
+/* ── Changelist filter ───────────────────────────────────── */
+#changelist-filter { background: var(--card) !important; border-left: 1px solid var(--border) !important; }
+#changelist-filter h2 { background: var(--raised) !important; color: var(--sub) !important; font-size: 10px !important; text-transform: uppercase !important; letter-spacing: .5px !important; padding: 10px 14px !important; margin: 0 !important; border-bottom: 1px solid var(--border) !important; }
+#changelist-filter h3 { color: var(--text) !important; font-size: 12px !important; font-weight: 600 !important; padding: 10px 14px 4px !important; margin: 0 !important; }
+#changelist-filter ul { list-style: none !important; padding: 0 14px 10px !important; margin: 0 !important; }
+#changelist-filter li a { color: var(--sub) !important; font-size: 12px !important; line-height: 2.2 !important; }
+#changelist-filter li a:hover { color: var(--text) !important; }
+#changelist-filter li.selected a { color: var(--blue) !important; font-weight: 600 !important; }
+#changelist .actions {
+    background: var(--raised) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--r) !important;
+    padding: 10px 14px !important;
+    margin-bottom: 12px !important;
+    color: var(--text) !important;
+}
+
+/* ── Recent actions ──────────────────────────────────────── */
+#recent-actions-module { background: var(--card) !important; border: 1px solid var(--border) !important; border-radius: 10px !important; overflow: hidden !important; }
+#recent-actions-module h2 { background: var(--raised) !important; color: var(--sub) !important; font-size: 10px !important; text-transform: uppercase !important; letter-spacing: .5px !important; padding: 10px 16px !important; border-bottom: 1px solid var(--border) !important; margin: 0 !important; }
+#recent-actions-module .actionlist { list-style: none !important; margin: 0 !important; padding: 0 !important; }
+#recent-actions-module .actionlist li { border-bottom: 1px solid var(--border) !important; padding: 9px 16px !important; font-size: 12px !important; color: var(--sub) !important; }
+#recent-actions-module .actionlist li:last-child { border-bottom: none !important; }
+#recent-actions-module .actionlist .addlink    { color: var(--green) !important; background: none !important; border: none !important; padding: 0 !important; font-size: 12px !important; }
+#recent-actions-module .actionlist .changelink { color: var(--blue) !important;  background: none !important; border: none !important; padding: 0 !important; font-size: 12px !important; }
+#recent-actions-module .actionlist .deletelink { color: var(--red) !important;   background: none !important; border: none !important; padding: 0 !important; font-size: 12px !important; }
+
+/* ── Pagination ──────────────────────────────────────────── */
+.paginator a, .paginator span { background: var(--card) !important; border: 1px solid var(--border) !important; color: var(--sub) !important; padding: 4px 10px !important; border-radius: var(--r) !important; font-size: 12px !important; }
+.paginator .this-page { border-color: var(--blue) !important; color: var(--blue) !important; font-weight: 600 !important; }
+.paginator a:hover { border-color: var(--sub) !important; color: var(--text) !important; }
+
+/* ── Dropdown ────────────────────────────────────────────── */
+.dropdown-menu { background: var(--card) !important; border: 1px solid var(--border) !important; border-radius: var(--r) !important; box-shadow: 0 8px 24px rgba(0,0,0,.4) !important; }
+.dropdown-item { color: var(--sub) !important; font-size: 13px !important; }
+.dropdown-item:hover { background: var(--raised) !important; color: var(--text) !important; }
+.dropdown-divider { border-color: var(--border) !important; }
+
+/* ── Messages ────────────────────────────────────────────── */
+.messagelist { list-style: none !important; padding: 0 !important; margin: 0 0 16px !important; }
+.messagelist .success { background: rgba(16,185,129,.1) !important; border: 1px solid rgba(16,185,129,.3) !important; color: #6ee7b7 !important; border-radius: var(--r) !important; padding: 10px 16px !important; }
+.messagelist .error { background: rgba(244,63,94,.1) !important; border: 1px solid rgba(244,63,94,.3) !important; color: #fda4af !important; border-radius: var(--r) !important; padding: 10px 16px !important; }
+
+/* ── Modal ───────────────────────────────────────────────── */
+.modal-content { background: var(--card) !important; border: 1px solid var(--border) !important; border-radius: 10px !important; color: var(--text) !important; }
+.modal-header { border-bottom: 1px solid var(--border) !important; }
+.modal-footer { border-top: 1px solid var(--border) !important; }
+
+/* ── Footer ──────────────────────────────────────────────── */
+.main-footer { background: var(--surface) !important; border-top: 1px solid var(--border) !important; color: var(--muted) !important; font-size: 11px !important; }
+
+/* ── Misc ────────────────────────────────────────────────── */
+hr { border-color: var(--border) !important; }
+.text-muted { color: var(--muted) !important; }
+select option { background: var(--raised) !important; color: var(--text) !important; }
+.object-tools a { font-size: 11px !important; text-transform: uppercase !important; letter-spacing: .4px !important; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--raised); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border); }

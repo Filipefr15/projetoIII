@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Técnica - Brand Tracker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+            max-width: 1200px;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .mermaid-wrapper {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
+        }
+        .description {
+            background: #f1f5f9;
+            padding: 15px 20px;
+            border-left: 4px solid #3b82f6;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📚 Documentação Técnica e Diagramas</h1>
+    <p style="text-align: center; color: #7f8c8d; margin-bottom: 40px;">Visão completa da arquitetura, fluxo de dados e casos de uso do sistema Brand Tracker.</p>
+
+    <!-- 1. CASO DE USO -->
+    <h2>👤 1. Diagrama de Casos de Uso (Use Case)</h2>
+    <div class="description">
+        Mapeia as interações do usuário final com as funcionalidades do sistema e como a Inteligência Artificial e a API Externa atuam como "Atores Secundários" no processo.
+    </div>
+    <div class="mermaid-wrapper">
+        <div class="mermaid">
+            flowchart LR
+                %% Atores
+                User(["👤 Usuário (Analista)"])
+                GNews(["📰 API GNews (Externo)"])
+                Gemini(["🧠 Google Gemini (IA)"])
+
+                %% Sistema
+                subgraph App ["Brand Tracker App"]
+                    direction TB
+                    UC1(("Pesquisar Marca/Termo"))
+                    UC2(("Visualizar Dashboard"))
+                    UC3(("Consultar Gráficos"))
+                    UC4(("Ler Resumo da IA"))
+                    UC7(("Coletar Notícias"))
+                    UC8(("Analisar Sentimento"))
+                    UC9(("Gerar Resumo Executivo"))
+                end
+
+                %% Relacionamentos
+                User --> UC1
+                User --> UC2
+                
+                UC2 -.->|"include"| UC3
+                UC2 -.->|"include"| UC4
+                
+                UC1 -.->|"include"| UC7
+                UC1 -.->|"include"| UC9
+                UC7 -.->|"include"| UC8
+                
+                UC7 --> GNews
+                UC9 --> Gemini
+        </div>
+    </div>
+
+    <!-- 2. ARQUITETURA TÉCNICA -->
+    <h2>🏗️ 2. Arquitetura Técnica do Sistema</h2>
+    <div class="description">
+        A visão estrutural mostrando as tecnologias envolvidas, desde a interface de usuário (Frontend) até o processamento síncrono/assíncrono no Backend e armazenamento.
+    </div>
+    <div class="mermaid-wrapper">
+        <div class="mermaid">
+            flowchart TB
+                classDef frontend fill:#E3F2FD,stroke:#1565C0,stroke-width:2px;
+                classDef backend fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px;
+                classDef database fill:#F3E5F5,stroke:#6A1B9A,stroke-width:2px;
+                classDef external fill:#ECEFF1,stroke:#455A64,stroke-width:2px,stroke-dasharray: 5 5;
+
+                UI["Frontend (Liquid Glass UI)\nHTMX + Tailwind + Chart.js"]:::frontend
+                
+                subgraph Core_Backend ["Backend (Django Core)"]
+                    View["Django Views\n(Controlador principal)"]:::backend
+                    Service["Services Layer\n(Lógica de Negócios)"]:::backend
+                    Model["Django ORM\n(Acesso a Dados)"]:::backend
+                end
+                
+                DB[("Banco de Dados\n(PostgreSQL / SQLite)")]:::database
+                
+                GNews(("GNews API\n(Busca de Manchetes)")):::external
+                Gemini(("Google Gemini\n(API via LangChain)")):::external
+
+                UI <-->|"HTTP GET /?q=marca"| View
+                View <-->|"Chama processamento"| Service
+                
+                Service <-->|"Consulta Notícias"| GNews
+                Service <-->|"Envia contexto para Resumo"| Gemini
+                
+                Service <-->|"Salva/Lê dados processados"| Model
+                Model <-->|"Queries SQL"| DB
+        </div>
+    </div>
+
+    <!-- 3. DIAGRAMA DE SEQUÊNCIA -->
+    <h2>⏱️ 3. Diagrama de Sequência (Fluxo de Busca)</h2>
+    <div class="description">
+        Demonstra o passo a passo cronológico de tudo que acontece nos bastidores quando o usuário clica no botão "Analisar".
+    </div>
+    <div class="mermaid-wrapper">
+        <div class="mermaid">
+            sequenceDiagram
+                actor U as Usuário
+                participant V as Django View
+                participant S as Service (fetch_news)
+                participant API as GNews API
+                participant IA as LangChain (Gemini)
+                participant DB as Banco de Dados
+                
+                U->>V: 1. Busca por "Nubank" (GET /?q=nubank)
+                activate V
+                
+                V->>S: 2. fetch_news_from_gnews("Nubank")
+                activate S
+                
+                S->>API: 3. Request (q=nubank, lang=pt)
+                activate API
+                API-->>S: 4. Retorna JSON com 10 artigos
+                deactivate API
+                
+                S->>DB: 5. Salva Notícias e Sentimento Básico
+                
+                S->>IA: 6. generate_ai_summary(noticias)
+                activate IA
+                IA-->>S: 7. Retorna Texto do Resumo Executivo
+                deactivate IA
+                
+                S->>DB: 8. Salva ResumoIA no Banco
+                
+                S-->>V: 9. Retorna Objeto Pesquisa consolidado
+                deactivate S
+                
+                V->>DB: 10. Prepara dados para os gráficos
+                V-->>U: 11. Renderiza Dashboard.html com Gráficos e IA
+                deactivate V
+        </div>
+    </div>
+
+    <!-- 4. ENTIDADE-RELACIONAMENTO (DER) -->
+    <h2>💾 4. Diagrama Entidade-Relacionamento (Banco de Dados)</h2>
+    <div class="description">
+        Mostra a estrutura do banco de dados relacional (ORM do Django) que construímos para o projeto.
+    </div>
+    <div class="mermaid-wrapper">
+        <div class="mermaid">
+            erDiagram
+                PESQUISA ||--o{ NOTICIA : "possui"
+                PESQUISA ||--o| RESUMO_IA : "tem um"
+                NOTICIA ||--o| ANALISE_SENTIMENTO : "tem uma"
+
+                PESQUISA {
+                    int id PK
+                    string termo "UNIQUE"
+                    datetime data_criacao
+                    datetime ultima_atualizacao
+                }
+
+                NOTICIA {
+                    int id PK
+                    int pesquisa_id FK
+                    string titulo
+                    text resumo
+                    string url "UNIQUE"
+                    datetime data_publicacao
+                    datetime data_coleta
+                }
+
+                ANALISE_SENTIMENTO {
+                    int id PK
+                    int noticia_id FK "OneToOne"
+                    string classificacao "POSITIVO, NEUTRO, NEGATIVO"
+                    float pontuacao
+                    datetime data_analise
+                }
+
+                RESUMO_IA {
+                    int id PK
+                    int pesquisa_id FK "OneToOne"
+                    text texto_resumo
+                    datetime data_geracao
+                }
+        </div>
+    </div>
+
+</div>
+
+<script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+</script>
+
+</body>
+</html>
