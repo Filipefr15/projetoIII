@@ -9,5 +9,6 @@ urlpatterns = [
 
     # App
     path('',              views.dashboard_view,  name='dashboard'),
+    path('diagnostico/',  views.diagnostico_view, name='diagnostico'),
     path('api/summary/',  views.ai_summary_view, name='api_summary'),
 ]

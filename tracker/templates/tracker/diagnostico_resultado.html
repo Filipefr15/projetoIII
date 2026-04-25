@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultado Diagnóstico — Brand Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0a0a0a; color: #e5e5e5; }
+        .result-card { background-color: #171717; border: 1px solid #262626; border-radius: 12px; }
+        .score-circle {
+            background: conic-gradient(#3b82f6 {{ diagnostico.score_aderencia }}%, #262626 0);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-12 px-4">
+
+    <div class="max-w-2xl w-full">
+        <div class="result-card p-10 text-center">
+            <h1 class="text-xl font-medium text-neutral-400 mb-2">Relatório de Aderência</h1>
+            <h2 class="text-3xl font-bold text-white mb-8">{{ diagnostico.nome_projeto }}</h2>
+
+            <!-- Circular Score -->
+            <div class="relative w-48 h-48 mx-auto mb-8 flex items-center justify-center">
+                <div class="score-circle absolute inset-0 rounded-full"></div>
+                <div class="absolute inset-4 bg-[#171717] rounded-full flex flex-col items-center justify-center">
+                    <span class="text-5xl font-bold text-white">{{ diagnostico.score_aderencia|floatformat:0 }}%</span>
+                    <span class="text-[10px] text-neutral-500 uppercase tracking-widest mt-1">Market Fit</span>
+                </div>
+            </div>
+
+            <div class="mb-10">
+                {% if diagnostico.score_aderencia >= 80 %}
+                    <div class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-4 rounded-lg">
+                        <p class="font-bold">Aderência Crítica Identificada!</p>
+                        <p class="text-sm mt-1">O projeto possui altíssima sinergia com o Brand Tracker. A automação é essencial para sua operação.</p>
+                    </div>
+                {% elif diagnostico.score_aderencia >= 50 %}
+                    <div class="bg-blue-500/10 border border-blue-500/20 text-blue-400 p-4 rounded-lg">
+                        <p class="font-bold">Aderência Moderada</p>
+                        <p class="text-sm mt-1">Existem ganhos claros de eficiência, especialmente na gestão de reputação e inteligência competitiva.</p>
+                    </div>
+                {% else %}
+                    <div class="bg-neutral-500/10 border border-neutral-500/20 text-neutral-400 p-4 rounded-lg">
+                        <p class="font-bold">Aderência Exploratória</p>
+                        <p class="text-sm mt-1">O projeto pode se beneficiar do monitoramento, mas os ganhos imediatos de escala são menores no momento.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 text-left">
+                <div class="bg-[#0a0a0a] p-4 rounded-lg border border-[#262626]">
+                    <p class="text-[10px] text-neutral-500 uppercase">Setor</p>
+                    <p class="text-sm font-medium text-white">{{ diagnostico.get_setor_display }}</p>
+                </div>
+                <div class="bg-[#0a0a0a] p-4 rounded-lg border border-[#262626]">
+                    <p class="text-[10px] text-neutral-500 uppercase">Analista</p>
+                    <p class="text-sm font-medium text-white">{{ request.user.username }}</p>
+                </div>
+            </div>
+
+            <div class="mt-10 flex gap-4">
+                <button onclick="window.print()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-3 rounded-lg transition-all">
+                    Imprimir PDF
+                </button>
+                <a href="{% url 'dashboard' %}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center">
+                    Ir para Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

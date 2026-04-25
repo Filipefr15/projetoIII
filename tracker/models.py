@@ -40,3 +40,35 @@ class ResumoIA(models.Model):
 
     def __str__(self):
         return f"Resumo IA para: {self.pesquisa.termo}"
+
+class DiagnosticoMercado(models.Model):
+    SETOR_CHOICES = [
+        ('TECH', 'Tecnologia'),
+        ('RETAIL', 'Varejo'),
+        ('FINANCE', 'Finanças'),
+        ('AGRO', 'Agronegócio'),
+        ('OTHER', 'Outro'),
+    ]
+    
+    usuario = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True)
+    nome_projeto = models.CharField(max_length=255)
+    setor = models.CharField(max_length=20, choices=SETOR_CHOICES)
+    
+    # Perguntas de Diagnóstico (Escala 1-5)
+    dor_monitoramento = models.IntegerField(help_text="O quanto o monitoramento manual de marcas é um problema?")
+    importancia_sentimento = models.IntegerField(help_text="Qual a importância de saber o sentimento do público em tempo real?")
+    necessidade_ia = models.IntegerField(help_text="O quanto resumos automáticos via IA agregariam valor?")
+    frequencia_crise = models.IntegerField(help_text="Com que frequência a marca enfrenta crises de imagem?")
+    
+    score_aderencia = models.FloatField(default=0.0)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    def calculate_score(self):
+        # Lógica simples para calcular aderência
+        total = self.dor_monitoramento + self.importancia_sentimento + self.necessidade_ia + self.frequencia_crise
+        self.score_aderencia = (total / 20) * 100
+        return self.score_aderencia
+
+    def __str__(self):
+        return f"Diagnóstico: {self.nome_projeto} - {self.score_aderencia}%"
+

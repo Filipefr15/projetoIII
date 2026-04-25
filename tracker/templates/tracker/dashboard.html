@@ -92,13 +92,19 @@
             </div>
 
             <!-- Global Search -->
-            <form id="searchForm" method="GET" action="/" class="w-full md:w-1/2 flex gap-2">
-                <input type="text" name="q" value="{{ query }}" placeholder="Pesquisar marca, concorrente ou ticker..." required
-                       class="input-field w-full px-4 py-2 rounded-md text-sm">
-                <button type="submit" class="btn-primary px-6 py-2 rounded-md text-sm font-medium">
-                    Buscar
-                </button>
-            </form>
+            <div class="w-full md:w-3/5 flex flex-col md:flex-row gap-4 items-center">
+                <form id="searchForm" method="GET" action="/" class="w-full flex gap-2">
+                    <input type="text" name="q" value="{{ query }}" placeholder="Pesquisar marca, concorrente ou ticker..." required
+                           class="input-field w-full px-4 py-2 rounded-md text-sm">
+                    <button type="submit" class="btn-primary px-6 py-2 rounded-md text-sm font-medium">
+                        Buscar
+                    </button>
+                </form>
+                <a href="{% url 'diagnostico' %}" class="shrink-0 text-xs font-semibold px-4 py-2 rounded-md border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 transition-all flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v10m14 0v-6a2 2 0 00-2-2h-2a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 00-2-2h-2a2 2 0 00-2 2v14"></path></svg>
+                    Diagnóstico
+                </a>
+            </div>
 
             <!-- User Area -->
             <div class="hidden md:flex items-center gap-4">

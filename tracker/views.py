@@ -4,8 +4,40 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from .models import Pesquisa, Noticia
+from .models import Pesquisa, Noticia, DiagnosticoMercado
 from .services import fetch_news_from_gnews, generate_ai_summary
+
+
+# ─────────────────────────────────────────
+#  DIAGNOSTICO
+# ─────────────────────────────────────────
+
+@login_required(login_url='/login/')
+def diagnostico_view(request):
+    if request.method == 'POST':
+        nome_projeto = request.POST.get('nome_projeto')
+        setor = request.POST.get('setor')
+        dor_monitoramento = int(request.POST.get('dor_monitoramento', 1))
+        importancia_sentimento = int(request.POST.get('importancia_sentimento', 1))
+        necessidade_ia = int(request.POST.get('necessidade_ia', 1))
+        frequencia_crise = int(request.POST.get('frequencia_crise', 1))
+        
+        diagnostico = DiagnosticoMercado.objects.create(
+            usuario=request.user,
+            nome_projeto=nome_projeto,
+            setor=setor,
+            dor_monitoramento=dor_monitoramento,
+            importancia_sentimento=importancia_sentimento,
+            necessidade_ia=necessidade_ia,
+            frequencia_crise=frequencia_crise
+        )
+        
+        score = diagnostico.calculate_score()
+        diagnostico.save()
+        
+        return render(request, 'tracker/diagnostico_resultado.html', {'diagnostico': diagnostico})
+
+    return render(request, 'tracker/diagnostico_form.html')
 
 
 # ─────────────────────────────────────────
