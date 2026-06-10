@@ -1,0 +1,51 @@
+# Ambiente virtual
+.venv/
+venv/
+env/
+ENV/
+
+# Cache Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Banco de dados local
+db.sqlite3
+*.sqlite3
+
+# Arquivos de build / dist
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Cobertura de testes
+.coverage
+htmlcov/
+.pytest_cache/
+
+# IDEs e editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos estáticos coletados (gerados via collectstatic)
+staticfiles/
+
+# Arquivos de mídia enviados por usuários
+media/
+
+# Variáveis de ambiente (descomente a linha abaixo se não quiser versionar o .env)
+# .env

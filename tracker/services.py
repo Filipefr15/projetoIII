@@ -1,5 +1,6 @@
 import os
 import requests
+from urllib.parse import quote_plus
 from django.utils import timezone
 from datetime import datetime
 from .models import Pesquisa, Noticia, AnaliseSentimento, ResumoIA
@@ -18,8 +19,9 @@ def fetch_news_from_gnews(query: str):
     Busca notícias recentes sobre o termo usando a GNews API.
     """
     pesquisa, created = Pesquisa.objects.get_or_create(termo=query.lower())
-    
-    url = f"https://gnews.io/api/v4/search?q={query}&lang=pt&country=br&max=10&apikey={GNEWS_API_KEY}"
+
+    search_query = f'"{query}"' if ' ' in query else query
+    url = f"https://gnews.io/api/v4/search?q={quote_plus(search_query)}&lang=pt&country=br&max=10&apikey={GNEWS_API_KEY}"
     
     try:
         response = requests.get(url)
@@ -108,42 +110,60 @@ def generate_ai_summary(pesquisa: Pesquisa):
     if not GEMINI_API_KEY:
         print("Chave do Gemini não configurada.")
         return None
-        
+
     noticias = pesquisa.noticias.all().order_by('-data_publicacao')[:10]
-    
-    if not noticias.exists():
+    total = noticias.count()
+
+    if total == 0:
         return None
-        
+
     contexto_noticias = ""
     for n in noticias:
-        contexto_noticias += f"- Título: {n.titulo}\n  Resumo: {n.resumo}\n\n"
-        
-    llm = ChatGoogleGenerativeAI(model="gemini-flash-latest", google_api_key=GEMINI_API_KEY)
-    
-    template = """
-    Você é um assistente de Relações Públicas analisando a percepção de uma marca.
-    Abaixo estão as últimas notícias sobre a marca ou tema: "{termo}".
-    
-    Notícias:
-    {noticias}
-    
-    Por favor, escreva um resumo executivo de no máximo 2 parágrafos. 
-    Destaque:
-    1. O principal acontecimento no momento.
-    2. Se a percepção atual é mais positiva, negativa ou neutra e por quê.
-    Seja direto, profissional e use tom jornalístico.
-    """
-    
-    prompt = PromptTemplate(template=template, input_variables=["termo", "noticias"])
+        resumo_trecho = n.resumo.strip() if n.resumo else "(sem resumo disponível)"
+        contexto_noticias += f"- Título: {n.titulo}\n  Resumo: {resumo_trecho}\n\n"
+
+    llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=GEMINI_API_KEY)
+
+    if total >= 3:
+        template = """
+Você é um assistente de Relações Públicas analisando a percepção de uma marca.
+Abaixo estão as últimas notícias sobre a marca ou tema: "{termo}".
+
+Notícias:
+{noticias}
+
+Escreva um resumo executivo de no máximo 2 parágrafos.
+Destaque:
+1. O principal acontecimento no momento.
+2. Se a percepção atual é mais positiva, negativa ou neutra e por quê.
+Seja direto, profissional e use tom jornalístico.
+"""
+    else:
+        template = """
+Você é um assistente de Relações Públicas analisando a percepção de uma marca.
+Foram encontradas apenas {total} notícia(s) recente(s) sobre "{termo}".
+
+Notícias disponíveis:
+{noticias}
+
+Com base nesse material limitado, escreva um breve parágrafo resumindo
+o que está sendo noticiado e qual o tom predominante. Mencione explicitamente
+que a análise é baseada em poucos resultados e pode não refletir o cenário completo.
+"""
+
+    input_vars = ["termo", "noticias"] if total >= 3 else ["termo", "noticias", "total"]
+    prompt = PromptTemplate(template=template, input_variables=input_vars)
     chain = prompt | llm | StrOutputParser()
-    
+
     try:
-        resultado = chain.invoke({"termo": pesquisa.termo, "noticias": contexto_noticias})
-        
-        # Limpar possiveis asteriscos e markdowns extras se o Gemini mandar
+        invoke_data = {"termo": pesquisa.termo, "noticias": contexto_noticias}
+        if total < 3:
+            invoke_data["total"] = total
+        resultado = chain.invoke(invoke_data)
+
         resultado_limpo = resultado.replace('**', '').strip()
-        
-        resumo, created = ResumoIA.objects.update_or_create(
+
+        resumo, _ = ResumoIA.objects.update_or_create(
             pesquisa=pesquisa,
             defaults={'texto_resumo': resultado_limpo}
         )
