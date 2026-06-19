@@ -122,7 +122,7 @@ def generate_ai_summary(pesquisa: Pesquisa):
         resumo_trecho = n.resumo.strip() if n.resumo else "(sem resumo disponível)"
         contexto_noticias += f"- Título: {n.titulo}\n  Resumo: {resumo_trecho}\n\n"
 
-    llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=GEMINI_API_KEY)
+    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", google_api_key=GEMINI_API_KEY)
 
     if total >= 3:
         template = """

@@ -299,7 +299,7 @@ python manage.py runserver
 
 ## 📸 Screenshots
 
-> 📂 Coloque suas imagens em `docs/screenshots/` com os nomes abaixo e elas aparecerão automaticamente aqui.
+> Capturas reais da aplicação rodando, com dados coletados ao vivo da GNews API.
 
 <div align="center">
 
